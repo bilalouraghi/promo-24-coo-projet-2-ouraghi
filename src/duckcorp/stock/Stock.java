@@ -5,6 +5,8 @@ import duckcorp.duck.DuckType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +14,7 @@ import java.util.Map;
  * Stock générique de canards.
  *
  * TODO (Ex3) :
- *   - Implémentez remove(), count(), countDefective(), countByType()
+ * - Implémentez remove(), count(), countDefective(), countByType()
  *
  * Les méthodes add(), getAll() et total() sont fournies.
  *
@@ -49,14 +51,28 @@ public class Stock<T extends Duck> {
      * @param type  le type de canard à retirer
      * @param count le nombre à retirer
      * @return la liste des canards retirés
-     * @throws IllegalStateException si le stock ne contient pas assez de canards du type demandé
+     * @throws IllegalStateException si le stock ne contient pas assez de canards du
+     *                               type demandé
      *
-     * Conseil : parcourez items en une seule passe.
-     * Attention à la signature de retour : elle doit conserver le type générique T.
+     *                               Conseil : parcourez items en une seule passe.
+     *                               Attention à la signature de retour : elle doit
+     *                               conserver le type générique T.
      */
     public List<T> remove(DuckType type, int count) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Stock.remove()");
+        List<T> result = new ArrayList<>();
+        Iterator<T> it = items.iterator();
+        while (it.hasNext() && count > 0) {
+            T item = it.next();
+            if (item.getType() == type) {
+                result.add(item);
+                it.remove();
+                count--;
+            }
+        }
+        if (count > 0) {
+            throw new IllegalStateException("Stock insuffisant : " + count + " canard(s) " + type + " manquant(s)");
+        }
+        return result;
     }
 
     /**
@@ -66,7 +82,14 @@ public class Stock<T extends Duck> {
      */
     public int count(DuckType type) {
         // TODO
-        throw new UnsupportedOperationException("TODO : Stock.count()");
+        int count = 0;
+        for (T item : items) {
+            if (item.getType() == type) {
+                count++;
+            }
+
+        }
+        return count;
     }
 
     /**
@@ -77,7 +100,13 @@ public class Stock<T extends Duck> {
      */
     public int countDefective() {
         // TODO
-        throw new UnsupportedOperationException("TODO : Stock.countDefective()");
+        int count = 0;
+        for (T item : items) {
+            if (item.isDefective()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -89,6 +118,10 @@ public class Stock<T extends Duck> {
      */
     public Map<DuckType, Integer> countByType() {
         // TODO
-        throw new UnsupportedOperationException("TODO : Stock.countByType()");
+        Map<DuckType, Integer> map = new HashMap<>();
+        for (T item : items) {
+            map.put(item.getType(), map.get(item.getType()) + 1);
+        }
+        return map;
     }
 }
