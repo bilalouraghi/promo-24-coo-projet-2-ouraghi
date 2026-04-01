@@ -62,8 +62,10 @@ public class ProductionStats {
      * uniquement une List<Duck>, ou quelque chose de plus général ?
      */
     public void recordProduction(List<Duck> ducks) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : ProductionStats.recordProduction()");
+        for (Duck duck : ducks) {
+            DuckType type = duck.getType();
+            produced.put(type, produced.getOrDefault(type, 0) + 1);
+        }
     }
 
     /**
@@ -71,8 +73,13 @@ public class ProductionStats {
      * Met à jour sold, totalRevenue et totalOrders.
      */
     public void recordSale(Order order) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : ProductionStats.recordSale()");
+        DuckType type = order.getDuckType();
+        int quantity = order.getQuantity();
+        double revenue = order.getTotalValue();
+
+        sold.put(type, sold.getOrDefault(type, 0) + quantity);
+        totalRevenue += revenue;
+        totalOrders++;
     }
 
     /**
@@ -80,8 +87,11 @@ public class ProductionStats {
      * Parcourez produced.values() avec une boucle.
      */
     public int getTotalProduced() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : ProductionStats.getTotalProduced()");
+        int total = 0;
+        for (int count : produced.values()) {
+            total += count;
+        }
+        return total;
     }
 
     /**
@@ -90,7 +100,14 @@ public class ProductionStats {
      * Retourne null si rien n'a encore été produit.
      */
     public DuckType getMostProduced() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : ProductionStats.getMostProduced()");
+        DuckType mostProduced = null;
+        int maxCount = 0;
+        for (Map.Entry<DuckType, Integer> entry : produced.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                mostProduced = entry.getKey();
+                maxCount = entry.getValue();
+            }
+        }
+        return mostProduced;
     }
 }
