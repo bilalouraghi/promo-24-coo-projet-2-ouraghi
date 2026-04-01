@@ -119,6 +119,9 @@ public class Stock<T extends Duck> {
     public Map<DuckType, Integer> countByType() {
         // TODO
         Map<DuckType, Integer> map = new HashMap<>();
+        for (DuckType type : DuckType.values()) {
+            map.put(type, 0);
+        }
         for (T item : items) {
             map.put(item.getType(), map.get(item.getType()) + 1);
         }
