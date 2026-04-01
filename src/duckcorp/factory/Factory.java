@@ -14,12 +14,14 @@ import java.util.List;
  * L'usine du joueur. Gère le budget, les machines, le stock et la réputation.
  *
  * TODO (Ex5) :
- *   - Implémentez buyMachine(), maintainMachine(), runProduction(), fulfillOrder()
+ * - Implémentez buyMachine(), maintainMachine(), runProduction(),
+ * fulfillOrder()
  *
  * TODO (Bonus 1) :
- *   - Implémentez endTurn()
+ * - Implémentez endTurn()
  *
  * Le constructeur, les getters et notifyExpiredOrder() sont fournis.
+ * 
  * @author Roussille Philippe <roussille@3il.fr>
  */
 public class Factory {
@@ -31,25 +33,40 @@ public class Factory {
     private final ProductionStats stats;
 
     public Factory(double initialBudget) {
-        this.budget     = initialBudget;
+        this.budget = initialBudget;
         this.reputation = 100.0;
-        this.stock      = new Stock<>();
-        this.machines   = new ArrayList<>();
-        this.stats      = new ProductionStats();
+        this.stock = new Stock<>();
+        this.machines = new ArrayList<>();
+        this.stats = new ProductionStats();
     }
 
     // --- Getters fournis ---
 
-    public double         getBudget()     { return budget; }
-    public double         getReputation() { return reputation; }
-    public Stock<Duck>    getStock()      { return stock; }
-    public List<Machine>  getMachines()   { return Collections.unmodifiableList(machines); }
-    public ProductionStats getStats()     { return stats; }
+    public double getBudget() {
+        return budget;
+    }
+
+    public double getReputation() {
+        return reputation;
+    }
+
+    public Stock<Duck> getStock() {
+        return stock;
+    }
+
+    public List<Machine> getMachines() {
+        return Collections.unmodifiableList(machines);
+    }
+
+    public ProductionStats getStats() {
+        return stats;
+    }
 
     // --- Méthodes fournies ---
 
     /**
-     * Signale qu'une commande a expiré : pénalise la réputation et met à jour les stats.
+     * Signale qu'une commande a expiré : pénalise la réputation et met à jour les
+     * stats.
      * Appelée par Game à chaque commande expirée. Ne pas modifier.
      */
     public void notifyExpiredOrder() {
@@ -59,7 +76,8 @@ public class Factory {
 
     /**
      * Calcule le score final du joueur.
-     * Formule : budget + réputation × 80 + commandesHonorées × 200 − commandesExpirées × 100
+     * Formule : budget + réputation × 80 + commandesHonorées × 200 −
+     * commandesExpirées × 100
      */
     public int computeScore() {
         return (int) (budget
@@ -77,8 +95,12 @@ public class Factory {
      * @return true si l'achat a réussi, false si budget insuffisant
      */
     public boolean buyMachine(Machine machine) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Factory.buyMachine()");
+        if (budget >= machine.getPurchaseCost()) {
+            budget -= machine.getPurchaseCost();
+            machines.add(machine);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -88,8 +110,12 @@ public class Factory {
      * @return true si la maintenance a réussi, false si budget insuffisant
      */
     public boolean maintainMachine(Machine machine) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Factory.maintainMachine()");
+        if (budget >= machine.getMaintenanceCost()) {
+            budget -= machine.getMaintenanceCost();
+            machine.maintain();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -103,27 +129,54 @@ public class Factory {
      * @return la liste de tous les canards produits ce tour
      */
     public List<Duck> runProduction() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Factory.runProduction()");
+        List<Duck> produced = new ArrayList<>();
+        for (Machine machine : machines) {
+            for (int i = 0; i < machine.getCapacity(); i++) {
+                Duck duck = machine.produceDuck();
+                stock.add(duck);
+                produced.add(duck);
+            }
+        }
+        stats.recordProduction(produced);
+        return produced;
     }
 
     /**
      * Tente d'honorer une commande.
      * Si le stock est suffisant :
-     *   - retire les canards du stock (les moins bons en premier, triés par qualité croissante)
-     *   - crédite le budget du montant de la commande
-     *   - met à jour la réputation selon la qualité moyenne des canards expédiés :
-     *       qualité moy. >= 70 → +3
-     *       qualité moy. >= 50 → +1
-     *       qualité moy. <  50 → 0  (pas de bonus)
-     *   - marque la commande comme honorée
-     *   - met à jour les stats
+     * - retire les canards du stock (les moins bons en premier, triés par qualité
+     * croissante)
+     * - crédite le budget du montant de la commande
+     * - met à jour la réputation selon la qualité moyenne des canards expédiés :
+     * qualité moy. >= 70 → +3
+     * qualité moy. >= 50 → +1
+     * qualité moy. < 50 → 0 (pas de bonus)
+     * - marque la commande comme honorée
+     * - met à jour les stats
      *
      * @return true si la commande a été honorée, false sinon
      */
     public boolean fulfillOrder(Order order) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Factory.fulfillOrder()");
+        if (order.canBeFulfilled(stock)) {
+            List<Duck> allDucks = stock.remove(order.getDuckType(), order.getQuantity());
+            allDucks.sort((d1, d2) -> Integer.compare(d1.getQualityScore(), d2.getQualityScore()));
+
+            double totalValue = order.getTotalValue();
+            budget += totalValue;
+
+            double averageQuality = allDucks.stream().mapToInt(Duck::getQualityScore).average().orElse(0);
+            if (averageQuality >= 70) {
+                reputation = Math.min(100, reputation + 3);
+            } else if (averageQuality >= 50) {
+                reputation = Math.min(100, reputation + 1);
+            }
+
+            order.fulfill();
+            stats.recordSale(order);
+            return true;
+        }
+        stats.recordExpiredOrder();
+        return false;
     }
 
     // --- TODO (Bonus 1) ---
