@@ -12,6 +12,7 @@ En Java, une interface ne peut pas contenir de champs d'instance (sauf des const
 
 # Question ex4:  Expliquez pourquoi canBeFulfilled(Stock<Duck> stock) serait une signature plus restrictive que canBeFulfilled(Stock<? extends Duck> stock). Donnez un exemple de code Java qui compilerait avec la seconde mais pas avec la première.
 
+## Réponse
 La signature canBeFulfilled(Stock<Duck> stock) est plus restrictive car elle n'accepte que des objets de type Stock qui contiennent exactement des Duck. En revanche, canBeFulfilled(Stock<? extends Duck> stock) accepte des objets de type Stock qui contiennent des Duck ou n'importe quelle sous-classe de Duck.
 
 nous avons StandardDuck, MiniDuck et LuxuryDuck qui étendent tous Duck. Le code suivant compilerait avec la seconde signature mais pas avec la première :
@@ -23,3 +24,9 @@ boolean canFulfill = order.canBeFulfilled(stockStandard);
 ```
 
 Avec canBeFulfilled(Stock<Duck> stock), le compilateur rejette Stock<StandardDuck> car il attend un Stock<Duck> exact. Avec canBeFulfilled(Stock<? extends Duck> stock), c'est accepté car StandardDuck est une sous-classe de Duck.
+
+# Question ex5: Factory expose getMachines() qui retourne une List<Machine> non modifiable (via Collections.unmodifiableList()). Pourquoi ce choix ? Que se passerait-il si on retournait la liste interne directement ? Peut-on quand même modifier les machines elles-mêmes (via leurs méthodes) depuis l'extérieur ?
+
+## Réponse
+
+Factory expose getMachines() qui retourne une List<Machine> non modifiable pour protéger l'intégrité de la liste interne des machines. Si on retournait la liste interne directement, les clients pourraient ajouter, supprimer ou réorganiser les machines dans la liste, ce qui pourrait causer des incohérences dans le fonctionnement de la Factory. En utilisant Collections.unmodifiableList(), on empêche les clients de modifier la structure de la liste, tout en leur permettant d'accéder aux machines elles-mêmes. Cependant, les clients peuvent toujours modifier les machines elles-mêmes en appelant leurs méthodes, car les machines sont des objets mutables. Le choix de rendre la liste non modifiable protège uniquement la collection, pas les objets qu'elle contient.
