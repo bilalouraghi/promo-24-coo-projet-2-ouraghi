@@ -67,8 +67,7 @@ public class Order {
      * Retourne la valeur totale de la commande (pricePerUnit * quantity).
      */
     public double getTotalValue() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Order.getTotalValue()");
+        return pricePerUnit * quantity;
     }
 
     /**
@@ -79,8 +78,7 @@ public class Order {
      * dont le type générique étend Duck, pas seulement Stock<Duck>.
      */
     public boolean canBeFulfilled(Stock<? extends Duck> stock) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Order.canBeFulfilled()");
+        return stock.countByType().getOrDefault(duckType, 0) >= quantity;
     }
 
     /**
@@ -88,26 +86,44 @@ public class Order {
      * Appelée par Factory.fulfillOrder() après retrait du stock.
      */
     public void fulfill() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Order.fulfill()");
+        this.status = OrderStatus.FULFILLED;
     }
 
     /**
-     * Deux commandes sont égales si et seulement si elles ont le même id.
+     * Compare cette commande avec un autre objet en fonction de son identifiant unique.
+     *
+     * Deux commandes sont égales si et seulement si elles possèdent le même ID.
+     * Cela permet d'utiliser les commandes dans un Set ou une Map sans doublons.
+     *
+     * @param o l'objet à comparer avec cette commande
+     * @return true si les deux objets représentent la même commande (même ID),
+     *         false sinon
+     * @see #hashCode()
      */
     @Override
     public boolean equals(Object o) {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Order.equals()");
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Order order = (Order) o;
+        return id.equals(order.id);
     }
 
     /**
-     * hashCode cohérent avec equals().
+     * Retourne le code de hachage de cette commande basé sur son identifiant unique.
+     *
+     * Cette implémentation est cohérente avec {@link #equals(Object)} : si deux
+     * commandes sont égales (même ID), elles produisent le même code de hachage.
+     *
+     * @return le code de hachage basé sur l'identifiant
+     * @see #equals(Object)
      */
     @Override
     public int hashCode() {
-        // TODO
-        throw new UnsupportedOperationException("TODO : Order.hashCode()");
+        return id.hashCode();
     }
 
     // --- toString fourni ---
