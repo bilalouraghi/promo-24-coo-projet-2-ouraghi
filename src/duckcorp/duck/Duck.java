@@ -70,10 +70,19 @@ public abstract class Duck implements Qualifiable {
         return id.equals(duck.id);
     }
 
-    /** TODO : implémentez hashCode() de façon cohérente avec equals(). */
+    /**
+     * Retourne le code de hachage de ce canard basé sur son identifiant unique.
+     *
+     * Cette implémentation est cohérente avec {@link #equals(Object)} :
+     * si deux canards sont égaux (même identifiant), ils produisent
+     * le même code de hachage.
+     *
+     * @return le code de hachage basé sur l'identifiant
+     * @see #equals(Object)
+     */
     @Override
     public int hashCode() {
-        throw new UnsupportedOperationException("TODO : Duck.hashCode()");
+        return id.hashCode();
     }
 
     // --- toString fourni ---
